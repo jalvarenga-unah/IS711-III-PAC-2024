@@ -46,16 +46,33 @@ console.log(dni)
 console.log(rtn)
 
 
-let test = "1";
 
+// truthy -> true, 1, "hola"
+// falsy -> false, 0, [], null
+// nulish -> undefined
 
-if (test === 1) {
+let test = '10';
+
+//? typeof test => retorna un string con el tipo de dato
+console.log(typeof test)
+
+//la evaluación con "==", hace un "cast" de valores
+if (test == 10) {
     //instrucciones cuando la condición se cumple
     console.log('SE CUMPLIO')
 } else {
     //instrucciones cuando la condición NO se cumple   
     console.log('NEL HERMANO')
 }
-// truthy -> true, 1, "hola"
-// falsy -> false, 0, [], null
-// nulish -> undefined
+
+// oeprador ternario
+const edad = null
+
+console.log(edad ?? 10)
+console.log(edad || 20)
+
+// const test2 = edad ?? 0
+
+const esMayor = edad ?? 0 > 18 ? 'Es mayor de edad' : 'Es menor de edad'
+
+console.log(esMayor)
