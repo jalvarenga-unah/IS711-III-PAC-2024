@@ -2,3 +2,9 @@ GET http://localhost:3000/users
 
 ###
 POST http://localhost:3000/
+content-type: "application/json"
+
+{
+    "nombre": "n",
+    "edad": 25   
+}

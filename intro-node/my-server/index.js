@@ -15,8 +15,6 @@ const app = http.createServer((request, response) => {
 
     const { method, url } = request
 
-    console.log(url)
-
     switch (method) {
         case 'GET':
 
@@ -31,7 +29,39 @@ const app = http.createServer((request, response) => {
             }
             break
         case 'POST':
-            response.end('Soy una peticion POST')
+
+            // 1. obtener la información enviada
+            // request.body
+            // Para cada petición
+            let body = ''
+
+            // listener para el evento 'data'
+            request.on('data', (chunck) => {
+                body += chunck.toString()
+            })
+
+            request.on('end', () => {
+                console.log(body)
+                body = JSON.parse(body)
+            })
+
+            if (body["nombre"].length < 3) {
+                response.statusCode = 400
+                response.end('El nombre debe tener al menos 3 caracteres')
+                return
+
+            }
+
+            // 2. procesar la información (validar que sea como esperamos que sea)
+
+
+
+
+
+            // 3. guardar la información (inserts en las BBDDD)
+            // 4. dar una respuesta al cliente
+
+            // response.end('Soy una peticion POST')
             break
         default:
             response.end('Soy una peticion que no es GET ni POST')
@@ -48,7 +78,7 @@ const app = http.createServer((request, response) => {
 
 
     //en funcion de lo que el cliente solicite, se da una respuesta
-    console.log('Holaaa desde el servidor')
+    // console.log('Holaaa desde el servidor')
     // response.end('Hola mundo!!') //servirle el contenido al cliente
 
 })
