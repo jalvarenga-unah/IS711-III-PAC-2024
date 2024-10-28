@@ -1,5 +1,6 @@
 import express, { json } from 'express'
 import users from './stores/users.json'  with {type: "json"}
+import { validateUserSchema } from './schemas/users.schema.js'
 
 const app = express() // instance de express (createServer)
 
@@ -65,6 +66,20 @@ app.get('/users/:id', (req, res) => {
 
 app.post('/users', (req, res) => {
 
+    // validar los datos de la peticion
+
+    const data = req.body
+    const { success, error } = validateUserSchema(data)
+
+    if (!success) {
+        res.status(400).json({
+            message: JSON.parse(error.message)
+        })
+    }
+    //guardar en la BBDD
+    users.push(data)
+
+    //responder al cliente
     res.json(req.body)
 })
 
