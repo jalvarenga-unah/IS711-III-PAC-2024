@@ -14,9 +14,11 @@ const userSchema = z.object(
         }).endsWith('unah.hn', {
             message: "El email debe ser de un estudiante de la UNAH"
         }),
-        "phone": z.string().length(8),
-        "website": z.string().url(),
+        "phone": z.string().length(8).optional(),
+        "website": z.string().url().optional(),
     },
-)
+).strict() // valida que no haya campos adicionales
 
 export const validateUserSchema = (user) => userSchema.safeParse(user)
+
+export const validatePartialSchema = (user) => userSchema.partial().safeParse(user)

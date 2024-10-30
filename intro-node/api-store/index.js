@@ -1,6 +1,7 @@
 import express, { json } from 'express'
 import users from './stores/users.json'  with {type: "json"}
-import { validateUserSchema } from './schemas/users.schema.js'
+import { validateUserSchema, validatePartialSchema } from './schemas/users.schema.js'
+import crypto from 'node:crypto'
 
 const app = express() // instance de express (createServer)
 
@@ -24,6 +25,8 @@ app.use(json()) //Middleware de express para capturar el body de la petición
 
 // })
 
+//TODO: manejo de CORS
+
 const PORT = process.env.PORT || 3000
 
 // Rutas
@@ -41,15 +44,15 @@ app.get('/users', (req, res) => {
 app.get('/users/:id', (req, res) => {
     const { id } = req.params
 
-    const parse_id = Number(id)
+    // const parse_id = Number(id)
 
-    if (!parse_id) {
-        res
-            .status(400)
-            .json({
-                message: "El valor del ID no es un número"
-            })
-    }
+    // if (!parse_id) {
+    //     res
+    //         .status(400)
+    //         .json({
+    //             message: "El valor del ID no es un número"
+    //         })
+    // }
 
     const user = users.find(user => user.id == id)
 
@@ -76,13 +79,53 @@ app.post('/users', (req, res) => {
             message: JSON.parse(error.message)
         })
     }
-    //guardar en la BBDD
+
+
+    const id = crypto.randomUUID()
+
+    data.id = id
+
+    //guardar en la BBDD (simulación)
     users.push(data)
 
     //responder al cliente
-    res.json(req.body)
+    res.status(201)
+        .json(req.body)
 })
 
+
+app.patch('/users/:id', (req, res) => {
+
+    const data = req.body
+    const { success, error } = validatePartialSchema(data)
+
+    if (!success) {
+        res.status(400).json({
+            message: JSON.parse(error.message)
+        })
+    }
+
+    const { id } = req.params
+
+    const userIndex = users.findIndex(user => user.id === id)
+
+    // hago referncia al usuario en el arreglo
+    // asignado el mismo objeto, pero ademas, reemplazando con los nuevos datos de la petición
+    if (userIndex === -1) {
+        res.status(404).json({
+            message: "Usuario no encontrado"
+        })
+    }
+
+    //TODO: actualizar en la BBDD
+    users[userIndex] = { ...users[userIndex], ...data } //simulación
+
+    res.json(users[userIndex])
+})
+
+app.delete('/users/:id', (req, res) => {
+    //.....
+})
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
