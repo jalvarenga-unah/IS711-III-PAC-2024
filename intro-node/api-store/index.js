@@ -2,12 +2,40 @@ import express, { json } from 'express'
 import users from './stores/users.json'  with {type: "json"}
 import { validateUserSchema, validatePartialSchema } from './schemas/users.schema.js'
 import crypto from 'node:crypto'
+import cors from 'cors'
 
 const app = express() // instance de express (createServer)
 
 //Middleware
 app.disable('x-powered-by')
 app.use(json()) //Middleware de express para capturar el body de la petición
+app.use(
+    cors({
+        origin: (origin, callback) => {
+
+            //* IMPORNTANTE: EL "origin" SOLO VIENE DESDE FUERA DEL SERVIDOR
+
+            const accesos_permitidos = [
+                'http://localhost:3000',
+                'http://localhost:5500',
+                'https://miapp.com'
+            ]
+
+            if (accesos_permitidos.includes(origin)) {
+                callback(null, true)
+            }
+
+            // Necesario para que resoponda a las peticiones desde el servidor
+            if (!origin) {
+                callback(null, true)
+            }
+
+            callback(new Error('Acceso denegado'))
+
+        },
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    })
+) //
 // app.use((req, res, next) => {
 
 //     if (req.method != 'POST') next()
@@ -35,6 +63,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/users', (req, res) => {
+
+    // const accesos_permitidos = [
+    //     'http://localhost:3000',
+    //     'http://localhost:5500',
+    //     'https://miapp.com'
+    // ]
+
+    // const origen = req.get('origin') // solo viene desde fuera del servidor
+
+    // if (accesos_permitidos.includes(origen)) {
+    // res.header('Access-Control-Allow-Origin', '*')
+    // }
+
+
     res
         .header('Content-Type', 'application/json')
         .status(200)
@@ -125,6 +167,13 @@ app.patch('/users/:id', (req, res) => {
 
 app.delete('/users/:id', (req, res) => {
     //.....
+})
+
+// Middleware para manejo de rutas inexistentes
+app.use((req, res) => {
+    res.status(404).json({
+        message: "URL no encontrada"
+    })
 })
 
 app.listen(PORT, () => {
