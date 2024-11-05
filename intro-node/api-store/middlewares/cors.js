@@ -13,11 +13,13 @@ export const corsMiddleware = () => cors({
 
         if (accesos_permitidos.includes(origin)) {
             callback(null, true)
+            return
         }
 
         // Necesario para que resoponda a las peticiones desde el servidor
         if (!origin) {
             callback(null, true)
+            return
         }
 
         callback(new Error('Acceso denegado'))
