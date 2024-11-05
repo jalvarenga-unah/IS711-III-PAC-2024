@@ -2,15 +2,40 @@
 import users from '../stores/users.json'  with {type: "json"}
 import { validateUserSchema, validatePartialSchema } from '../schemas/users.schema.js'
 import crypto from 'node:crypto'
+import connection from '../db/connection.js'
 
 export class UserController {
 
 
     static getAllUsers(req, res) {
-        res
-            .header('Content-Type', 'application/json')
-            .status(200)
-            .json(users)
+        const consulta = "SELECT user_id,  username,  password_hash,  email,  full_name,  role,  must_change_password,  status,  created_at,  updated_at FROM users"
+
+        try {
+            connection.query(consulta, (error, results) => {
+
+                if (error) {
+                    return res.status(400).json({
+                        error: true,
+                        message: "Ocurrió un error al obtener los dato: " + error
+                    })
+                }
+
+
+                return res
+                    .header('Content-Type', 'application/json')
+                    .status(200)
+                    .json(results)
+
+            })
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: true,
+                message: "Ocurrió un error al obtener los dato"
+            })
+
+        }
     }
 
     static getUserById(req, res) {
