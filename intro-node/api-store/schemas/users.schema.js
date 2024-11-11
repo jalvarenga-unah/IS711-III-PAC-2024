@@ -14,8 +14,8 @@ const userSchema = z.object(
         }).endsWith('unah.hn', {
             message: "El email debe ser de un estudiante de la UNAH"
         }),
-        "phone": z.string().length(8).optional(),
-        "website": z.string().url().optional(),
+        "phone": z.string().length(8).optional(), // "optional": permite no enviar la propiedad
+        "website": z.string().url().optional(), // si quiero que pueda aceptar nulos, uso: nullable
     },
 ).strict() // valida que no haya campos adicionales
 

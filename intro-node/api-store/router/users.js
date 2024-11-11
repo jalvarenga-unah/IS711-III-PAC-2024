@@ -6,7 +6,7 @@ const userRouter = Router()
 // /users
 userRouter.get('/', UserController.getAllUsers)
 
-userRouter.get('/:id', UserController.getUserById)
+userRouter.get('/:user_id', UserController.getUserById)
 
 userRouter.post('/', UserController.createUser)
 
