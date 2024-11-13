@@ -1,7 +1,7 @@
 
 import users from '../stores/users.json'  with {type: "json"}
-import { validateUserSchema, validatePartialSchema } from '../schemas/users.schema.js'
-import crypto from 'node:crypto'
+import { validatePartialSchema, validateUserSchemaDB } from '../schemas/users.schema.js'
+import bcrypt from 'bcrypt'
 import connection from '../db/connection.js'
 
 export class UserController {
@@ -83,8 +83,15 @@ export class UserController {
 
     static createUser(req, res) {
 
+
+        const query = `INSERT INTO users (username, password_hash, email, full_name, role, must_change_password, status) 
+                        VALUES ( ?, ?, ?, ?, ?, ?, ? ) `
+
+        // const query = `INSERT INTO users (username, password_hash, email, full_name, role, must_change_password, status) 
+        //                 VALUES (:username, :password_hash, :email, :full_name, :role, :must_change_password, :status) `
+
         const data = req.body
-        const { success, error } = validateUserSchema(data)
+        const { success, error } = validateUserSchemaDB(data)
 
         if (!success) {
             res.status(400).json({
@@ -92,16 +99,30 @@ export class UserController {
             })
         }
 
-        const id = crypto.randomUUID()
+        try {
 
-        data.id = id
+            const { username, password_hash, email, full_name, role, must_change_password, status } = data
 
-        //guardar en la BBDD (simulación)
-        users.push(data)
+            const password = bcrypt.hashSync(password_hash, 10)
 
-        //responder al cliente
-        res.status(201)
-            .json(req.body)
+            connection.query(query, [username, password, email, full_name, role, must_change_password, status], (error, results) => {
+                if (error) {
+                    return res.status(400).json({
+                        error: true,
+                        message: "Ocurrió un error al obtener los dato: " + error
+                    })
+                }
+                return res
+                    .header('Content-Type', 'application/json')
+                    .status(201)
+                    .json(data)
+            })
+        } catch (error) {
+            res.status(400).json({
+                error: true,
+                message: "Ocurrió un error al obtener los dato"
+            })
+        }
     }
 
     static updateUser(req, res) {
