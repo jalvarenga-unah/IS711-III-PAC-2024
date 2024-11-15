@@ -85,7 +85,7 @@ export class UserController {
 
 
         const query = `INSERT INTO users (username, password_hash, email, full_name, role, must_change_password, status) 
-                        VALUES ( ?, ?, ?, ?, ?, ?, ? ) `
+                        VALUES ( ?, ?, ?, ?, ?, ?, ? ) `//bind params
 
         // const query = `INSERT INTO users (username, password_hash, email, full_name, role, must_change_password, status) 
         //                 VALUES (:username, :password_hash, :email, :full_name, :role, :must_change_password, :status) `
@@ -103,6 +103,7 @@ export class UserController {
 
             const { username, password_hash, email, full_name, role, must_change_password, status } = data
 
+            //crea el hash de la contraseña
             const password = bcrypt.hashSync(password_hash, 10)
 
             connection.query(query, [username, password, email, full_name, role, must_change_password, status], (error, results) => {

@@ -1,5 +1,6 @@
 import express, { json } from 'express'
 import userRouter from './router/users.js'
+import authRouter from './router/auth.js'
 import { corsMiddleware } from './middlewares/cors.js'
 
 const app = express() // instance de express (createServer)
@@ -12,6 +13,7 @@ app.use(corsMiddleware())
 const PORT = process.env.PORT || 3000
 
 //Rutas
+app.use('/auth', authRouter)
 app.use('/users', userRouter)
 
 // Middleware para manejo de rutas inexistentes
